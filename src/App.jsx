@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
-import './App.css';
+import './App.less';
 
-import { Button } from "react-bootstrap";
+import {AppHeader, AppViewer} from "./modules/components";
 
 class App extends Component {
   render() {
     return (
       <div className="App">
-        <Button bsSize="large" bsStyle="primary">
-          Whiteboard
-        </Button>
+        <AppHeader />
+        <AppViewer />
       </div>
     );
   }
