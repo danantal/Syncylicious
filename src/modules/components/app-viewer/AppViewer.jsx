@@ -9,15 +9,13 @@ export class AppViewer extends Component {
 
     render() {
         return (
-            <Row>
-                <Col md={12}>
-                    <Switch>
-                        <Route exact path="/" component={WelcomePage} />
-                        <Route path='/whiteboard' component={Whiteboard} />
-                        <Route exact path='/about' component={AboutPage} />
-                    </Switch>
-                </Col>
-            </Row>
+            <Col md={12}>
+                <Switch>
+                    <Route exact path="/" component={WelcomePage} />
+                    <Route path='/whiteboard' component={Whiteboard} />
+                    <Route exact path='/about' component={AboutPage} />
+                </Switch>
+            </Col>
         );
     }
 }
