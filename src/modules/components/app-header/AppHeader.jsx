@@ -9,7 +9,7 @@ export class AppHeader extends Component {
     render() {
         return (
             <div className="app-header">
-                <Navbar collapseOnSelect >
+                <Navbar collapseOnSelect fixedTop>
                     <Navbar.Header>
                         <Navbar.Brand>
                             <NavLink to="/">Syncylicious</NavLink>

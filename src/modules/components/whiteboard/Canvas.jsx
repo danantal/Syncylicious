@@ -1,4 +1,5 @@
 import "./Canvas.less";
+import io from "socket.io-client";
 
 import React, { Component } from "react";
 
@@ -14,7 +15,6 @@ const throttle = (callback, delay) => {
     };
 }
 
-
 export class Canvas extends Component {
     constructor() {
         super();
@@ -25,6 +25,28 @@ export class Canvas extends Component {
         this.onMouseMove = throttle(this.onMouseMove.bind(this), 10);
         this.onMouseUp = this.onMouseUp.bind(this);
 
+        this.onTouchStart = this.onTouchStart.bind(this);
+        this.onTouchMove = throttle(this.onTouchMove.bind(this), 10);
+        this.onTouchEnd = this.onTouchEnd.bind(this);
+
+        this.onDrawingEvent = this.onDrawingEvent.bind(this);
+    }
+
+    onRefCallback(canvas) {
+        this.canvas = canvas;
+    }
+
+    componentDidMount() {
+        const port = "5000";
+        const uri = window.location.protocol + "//" + window.location.hostname + ":" + port;
+        this.socket = io(uri);
+        this.socket.on('drawing', this.onDrawingEvent);
+    }    
+
+    onDrawingEvent(data) {
+        var w = this.props.width;
+        var h = this.props.height;
+        this.drawLine(data.x0 * w, data.y0 * h, data.x1 * w, data.y1 * h, data.color);
     }
 
     drawLine(x0, y0, x1, y1, color, emit) {
@@ -38,16 +60,16 @@ export class Canvas extends Component {
 
         if (!emit) { return; }
 
-        // var w = canvas.width;
-        // var h = canvas.height;
+        var w = this.props.width;
+        var h = this.props.height;
 
-        // socket.emit('drawing', {
-        //   x0: x0 / w,
-        //   y0: y0 / h,
-        //   x1: x1 / w,
-        //   y1: y1 / h,
-        //   color: color
-        // });
+        this.socket.emit('drawing', {
+            x0: x0 / w,
+            y0: y0 / h,
+            x1: x1 / w,
+            y1: y1 / h,
+            color
+        });
     }
 
     onMouseDown(e) {
@@ -75,15 +97,47 @@ export class Canvas extends Component {
         this.current.y = e.clientY;
     }
 
+    onTouchStart(e) {
+        e.preventDefault();
+
+        this.drawing = true;
+        this.current.x = e.touches[0].clientX;
+        this.current.y = e.touches[0].clientY;
+    }
+
+    onTouchEnd(e) {
+        e.preventDefault();
+
+        if (!this.drawing) {
+            return;
+        }
+
+        this.drawing = false;
+    }
+
+    onTouchMove(e) {
+        e.preventDefault();
+
+        if (!this.drawing) {
+            return;
+        }
+
+        this.drawLine(this.current.x, this.current.y, e.touches[0].clientX, e.touches[0].clientY, this.current.color, true);
+        this.current.x = e.touches[0].clientX;
+        this.current.y = e.touches[0].clientY;
+    }
+
     render() {
         return (
-            <canvas width={this.props.width} height={this.props.height} ref={(canvas) => this.canvas = canvas} onMouseDown={this.onMouseDown} onMouseMove={this.onMouseMove} onMouseUp={this.onMouseUp} />
+            <canvas width={this.props.width} height={this.props.height} ref={(canvas) => this.onRefCallback(canvas)} 
+                onMouseDown={this.onMouseDown} onMouseMove={this.onMouseMove} onMouseUp={this.onMouseUp} onMouseLeave={this.onMouseUp}
+                onTouchStart={this.onTouchStart} onTouchMove={this.onTouchMove} onTouchEnd={this.onTouchEnd} />
         );
     }
 }
 
 Canvas.defaultProps = {
     color: "black",
-    width: "1650",
-    height: "825"
+    width: "1680",
+    height: "100"
 }
