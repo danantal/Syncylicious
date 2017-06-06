@@ -1,5 +1,5 @@
 import "./Canvas.less";
-import io from "socket.io-client";
+import { WebsocketService } from "services/WebsocketService";
 
 import React, { Component } from "react";
 
@@ -37,11 +37,8 @@ export class Canvas extends Component {
     }
 
     componentDidMount() {
-        const port = "5000";
-        const uri = window.location.protocol + "//" + window.location.hostname + ":" + port;
-        this.socket = io(uri);
-        this.socket.on('drawing', this.onDrawingEvent);
-    }    
+        WebsocketService.subscribe("drawing", this.onDrawingEvent)
+    }
 
     onDrawingEvent(data) {
         var w = this.props.width;
@@ -63,7 +60,7 @@ export class Canvas extends Component {
         var w = this.props.width;
         var h = this.props.height;
 
-        this.socket.emit('drawing', {
+        WebsocketService.dispatch("drawing", {
             x0: x0 / w,
             y0: y0 / h,
             x1: x1 / w,
@@ -129,7 +126,7 @@ export class Canvas extends Component {
 
     render() {
         return (
-            <canvas width={this.props.width} height={this.props.height} ref={(canvas) => this.onRefCallback(canvas)} 
+            <canvas width={this.props.width} height={this.props.height} ref={(canvas) => this.onRefCallback(canvas)}
                 onMouseDown={this.onMouseDown} onMouseMove={this.onMouseMove} onMouseUp={this.onMouseUp} onMouseLeave={this.onMouseUp}
                 onTouchStart={this.onTouchStart} onTouchMove={this.onTouchMove} onTouchEnd={this.onTouchEnd} />
         );
@@ -137,7 +134,7 @@ export class Canvas extends Component {
 }
 
 Canvas.defaultProps = {
-    color: "black",
-    width: "1680",
-    height: "100"
+    color: "#000",
+    width: "0",
+    height: "0"
 }
