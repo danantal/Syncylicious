@@ -1,0 +1,15 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Syncylicous server",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "Dan Antal",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.15.3",
+    "socket.io": "^2.0.2"
+  }
+}
