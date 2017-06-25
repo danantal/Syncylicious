@@ -126,9 +126,11 @@ export class Canvas extends Component {
 
     render() {
         return (
-            <canvas width={this.props.width} height={this.props.height} ref={(canvas) => this.onRefCallback(canvas)}
-                onMouseDown={this.onMouseDown} onMouseMove={this.onMouseMove} onMouseUp={this.onMouseUp} onMouseLeave={this.onMouseUp}
-                onTouchStart={this.onTouchStart} onTouchMove={this.onTouchMove} onTouchEnd={this.onTouchEnd} />
+            <canvas width={this.props.width} height={this.props.height} 
+                ref={(canvas) => this.onRefCallback(canvas)} onMouseDown={this.onMouseDown} 
+                onMouseMove={this.onMouseMove} onMouseUp={this.onMouseUp} 
+                onMouseLeave={this.onMouseUp} onTouchStart={this.onTouchStart} 
+                onTouchMove={this.onTouchMove} onTouchEnd={this.onTouchEnd} />
         );
     }
 }

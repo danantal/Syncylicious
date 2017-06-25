@@ -6,7 +6,7 @@ import {AppHeader, AppViewer} from "./modules/components";
 class App extends Component {
   render() {
     return (
-      <div className="App">
+      <div className="app">
         <AppHeader />
         <AppViewer />
       </div>

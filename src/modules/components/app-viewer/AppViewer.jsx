@@ -10,7 +10,7 @@ export class AppViewer extends Component {
         return (
             <Switch>
                 <Route exact path="/" component={WelcomePage} />
-                <Route path='/whiteboard' component={Whiteboard} />
+                <Route path='/whiteboard/:roomId?' component={Whiteboard} />
                 <Route exact path='/about' component={AboutPage} />
             </Switch>
         );

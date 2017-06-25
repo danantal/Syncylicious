@@ -20,8 +20,20 @@ const http = app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
 
 const socketServer = io(http);
 socketServer.on("connection", (socket) => {
-    console.log("User connected.");
-    socket.on("drawing", (data) => socket.broadcast.emit("drawing", data));
+    console.log(`User connected: ${socket.id}`);
+    socket.on("createRoom", (roomId) => {
+        socket.join(roomId);
+        console.log(`User: ${socket.id} created room: ${roomId}`);
+        socketServer.sockets.to(socket.id).emit("roomJoined", {roomId});
+    });
+    socket.on("joinRoom", (roomId) => {
+        if(socketServer.sockets.adapter.rooms[roomId] != null) {
+            socket.join(roomId);
+            console.log(`User joined room: ${roomId}`);
+            socketServer.sockets.to(socket.id).emit("roomJoined", {roomId});
+        }
+    });
+    socket.on("drawing", (payload) => socket.broadcast.to(payload.roomId).emit("drawing", payload.data));
     socket.on("disconnect", () => console.log("User disconnected."))
 });
 
