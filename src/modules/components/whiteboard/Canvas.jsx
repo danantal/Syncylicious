@@ -22,11 +22,11 @@ export class Canvas extends Component {
         this.current = {};
 
         this.onMouseDown = this.onMouseDown.bind(this);
-        this.onMouseMove = throttle(this.onMouseMove.bind(this), 10);
+        this.onMouseMove = throttle(this.onMouseMove.bind(this), 5);
         this.onMouseUp = this.onMouseUp.bind(this);
 
         this.onTouchStart = this.onTouchStart.bind(this);
-        this.onTouchMove = throttle(this.onTouchMove.bind(this), 10);
+        this.onTouchMove = throttle(this.onTouchMove.bind(this), 5);
         this.onTouchEnd = this.onTouchEnd.bind(this);
 
         this.onDrawingEvent = this.onDrawingEvent.bind(this);
@@ -43,16 +43,31 @@ export class Canvas extends Component {
     onDrawingEvent(data) {
         var w = this.props.width;
         var h = this.props.height;
-        this.drawLine(data.x0 * w, data.y0 * h, data.x1 * w, data.y1 * h, data.color);
+        if(data.clear) {
+            this.clear();
+        }
+        this.drawLine(data.x0 * w, data.y0 * h, data.x1 * w, data.y1 * h, data.color, data.lineWidth);
+    }
+    
+    clear(emit) {
+        const context = this.canvas.getContext("2d");
+        context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        if(emit) {
+            WebsocketService.dispatch("drawing", {
+                clear: true
+            });
+        }
     }
 
-    drawLine(x0, y0, x1, y1, color, emit) {
+    drawLine(x0, y0, x1, y1, color, lineWidth, emit) {
         const context = this.canvas.getContext("2d");
+        context.lineCap = "round";
         context.beginPath();
         context.moveTo(x0, y0);
         context.lineTo(x1, y1);
         context.strokeStyle = color;
-        context.lineWidth = 2;
+        context.lineWidth = lineWidth;
         context.stroke();
 
         if (!emit) { return; }
@@ -65,7 +80,8 @@ export class Canvas extends Component {
             y0: y0 / h,
             x1: x1 / w,
             y1: y1 / h,
-            color
+            color,
+            lineWidth
         });
     }
 
@@ -81,7 +97,7 @@ export class Canvas extends Component {
         }
 
         this.drawing = false;
-        this.drawLine(this.current.x, this.current.y, e.clientX, e.clientY, this.props.color, true);
+        this.drawLine(this.current.x, this.current.y, e.clientX, e.clientY, this.props.color, this.props.lineWidth, true);
     }
 
     onMouseMove(e) {
@@ -89,7 +105,7 @@ export class Canvas extends Component {
             return;
         }
 
-        this.drawLine(this.current.x, this.current.y, e.clientX, e.clientY, this.current.color, true);
+        this.drawLine(this.current.x, this.current.y, e.clientX, e.clientY, this.props.color, this.props.lineWidth, true);
         this.current.x = e.clientX;
         this.current.y = e.clientY;
     }
@@ -119,7 +135,7 @@ export class Canvas extends Component {
             return;
         }
 
-        this.drawLine(this.current.x, this.current.y, e.touches[0].clientX, e.touches[0].clientY, this.current.color, true);
+        this.drawLine(this.current.x, this.current.y, e.touches[0].clientX, e.touches[0].clientY, this.props.color, this.props.lineWidth, true);
         this.current.x = e.touches[0].clientX;
         this.current.y = e.touches[0].clientY;
     }
